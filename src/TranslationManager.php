@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use JoeDixon\Translation\Drivers\Database;
 use JoeDixon\Translation\Drivers\File;
+use JoeDixon\Translation\Drivers\JSONFile;
 
 class TranslationManager
 {
@@ -28,7 +29,7 @@ class TranslationManager
         $driverResolver = Str::studly($driver);
         $method = "resolve{$driverResolver}Driver";
 
-        if (! method_exists($this, $method)) {
+        if (!method_exists($this, $method)) {
             throw new \InvalidArgumentException("Invalid driver [$driver]");
         }
 
@@ -39,7 +40,10 @@ class TranslationManager
     {
         return new File(new Filesystem, $this->app['path.lang'], $this->app->config['app']['locale'], $this->scanner);
     }
-
+    protected function resolveJSONFileDriver()
+    {
+        return new JSONFile(new Filesystem, $this->app['path.lang'], $this->app->config['app']['locale'], $this->scanner);
+    }
     protected function resolveDatabaseDriver()
     {
         return new Database($this->app->config['app']['locale'], $this->scanner);
